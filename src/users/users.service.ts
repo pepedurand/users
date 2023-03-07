@@ -5,12 +5,14 @@ import { User } from './interface/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync, unlinkSync, writeFileSync } from 'fs';
 import axios from 'axios';
+import { Image } from './interface/image.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectModel('image') private readonly imageModel: Model<Image>,
     @InjectModel('user') private readonly userModel: Model<User>,
     private readonly httpService: HttpService,
   ) {}
@@ -51,15 +53,21 @@ export class UsersService {
       .then((response) =>
         Buffer.from(response.data, 'binary').toString('base64'),
       );
+
     const path = `./src/assets/image${_id}.txt`;
+
     if (!existsSync(path)) {
       writeFileSync(path, response);
+      const avatarImage = new this.imageModel({ userId: _id, file: path });
+      return await avatarImage.save();
     }
 
-    return avatar;
+    return this.imageModel.findOne({ userId: _id });
   }
 
-  async remove(_id: string) {
-    return this.userModel.deleteOne({ _id });
+  async remove(userId: string) {
+    const path = `./src/assets/image${userId}.txt`;
+    unlinkSync(path);
+    return this.imageModel.deleteOne({ userId });
   }
 }
