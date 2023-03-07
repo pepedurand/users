@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Model } from 'mongoose';
 import { User } from './interface/user.interface';
@@ -39,6 +43,14 @@ export class UsersService {
     } catch (error) {
       throw new Error(`Failed to fetch data from url. Error: ${error.message}`);
     }
+  }
+
+  async findUserAvatar(_id: string) {
+    const foundAvatar = await this.userModel.findOne({ _id });
+    if (!foundAvatar) {
+      throw new NotFoundException(`User with id: ${_id}, not found`);
+    }
+    return foundAvatar.avatar;
   }
 
   remove(id: number) {

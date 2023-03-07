@@ -27,6 +27,11 @@ export class UsersController {
     return await this.usersService.findOne(id);
   }
 
+  @Get(':id/avatar')
+  async findUserAvatar(@Param('id') id: string) {
+    return await this.usersService.findUserAvatar(id);
+  }
+
   @Delete(':id/avatar')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
