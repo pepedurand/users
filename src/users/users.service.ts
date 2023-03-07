@@ -5,6 +5,8 @@ import { User } from './interface/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { existsSync, writeFileSync } from 'fs';
+import axios from 'axios';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +45,17 @@ export class UsersService {
 
   async findUserAvatar(_id: string) {
     const { avatar } = await this.userModel.findOne({ _id });
+
+    const response = await axios
+      .get(avatar, { responseType: 'arraybuffer' })
+      .then((response) =>
+        Buffer.from(response.data, 'binary').toString('base64'),
+      );
+    const path = `./src/assets/image${_id}.txt`;
+    if (!existsSync(path)) {
+      writeFileSync(path, response);
+    }
+
     return avatar;
   }
 

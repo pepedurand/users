@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './interface/user.interface';
 
 @Controller('api/users')
 export class UsersController {
@@ -18,7 +17,7 @@ export class UsersController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async create(@Body() createUser: CreateUserDto): Promise<User> {
+  async create(@Body() createUser: CreateUserDto) {
     return await this.usersService.create(createUser);
   }
 
