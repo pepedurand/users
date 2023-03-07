@@ -3,10 +3,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Model } from 'mongoose';
 import { User } from './interface/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('user') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('user') private readonly userModel: Model<User>,
+    private readonly httpService: HttpService,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
 
@@ -24,8 +29,16 @@ export class UsersService {
     return await createdUser.save();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`https://reqres.in/api/users/${id}`),
+      );
+
+      return data.data;
+    } catch (error) {
+      throw new Error(`Failed to fetch data from url. Error: ${error.message}`);
+    }
   }
 
   remove(id: number) {
