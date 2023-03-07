@@ -8,7 +8,6 @@ import { firstValueFrom } from 'rxjs';
 import { existsSync, unlinkSync, writeFileSync } from 'fs';
 import axios from 'axios';
 import { Image } from './interface/image.interface';
-import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +15,6 @@ export class UsersService {
     @InjectModel('image') private readonly imageModel: Model<Image>,
     @InjectModel('user') private readonly userModel: Model<User>,
     private readonly httpService: HttpService,
-    private readonly mailerService: MailerService,
   ) {}
   async create(createUserDto: CreateUserDto) {
     const { email } = createUserDto;

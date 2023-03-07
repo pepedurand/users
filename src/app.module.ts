@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 
@@ -7,6 +8,9 @@ import { UsersModule } from './users/users.module';
     MongooseModule.forRoot(
       'mongodb+srv://admin:admin@users.nff7kzb.mongodb.net/?retryWrites=true&w=majority',
     ),
+    ConfigModule.forRoot({
+      envFilePath: ['.env', 'rabbitmq.env'],
+    }),
     UsersModule,
   ],
 })
