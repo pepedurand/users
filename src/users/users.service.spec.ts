@@ -7,6 +7,15 @@ import * as sinon from 'sinon';
 import { axiosResponse } from '../test/axios-response.helper';
 import { getModelToken } from '@nestjs/mongoose';
 
+const userId = '1';
+const expectedUser = {
+  id: 11,
+  email: 'george.edwards@reqres.in',
+  first_name: 'George',
+  last_name: 'Edwards',
+  avatar: 'https://reqres.in/img/faces/11-image.jpg',
+};
+
 describe('Users Service', () => {
   let userService: UsersService;
   const httpService = sinon.createStubInstance(HttpService);
@@ -25,15 +34,6 @@ describe('Users Service', () => {
   });
 
   it('should return a user with the given id', async () => {
-    const userId = '1';
-    const expectedUser = {
-      id: 11,
-      email: 'george.edwards@reqres.in',
-      first_name: 'George',
-      last_name: 'Edwards',
-      avatar: 'https://reqres.in/img/faces/11-image.jpg',
-    };
-
     const response = axiosResponse(HttpStatus.OK, { data: expectedUser }, 'Ok');
 
     httpService.get
@@ -42,5 +42,15 @@ describe('Users Service', () => {
 
     const user = await userService.findOne(userId);
     expect(user).toEqual(expectedUser);
+  });
+  it('deve retornar o avatar do usuário', async () => {
+    jest
+      .spyOn(userService, 'findUserAvatar')
+      .mockImplementation(() =>
+        axiosResponse(HttpStatus.OK, expectedUser, 'Ok'),
+      );
+
+    const foundAvatar = await userService.findUserAvatar(userId);
+    expect(foundAvatar).toMatchObject({ data: expectedUser });
   });
 });
