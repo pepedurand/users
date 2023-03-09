@@ -29,8 +29,7 @@ export class UsersService {
       );
     }
 
-    const createdUser = new this.userModel(createUserDto);
-    return await createdUser.save();
+    return this.userModel.create(createUserDto);
   }
 
   async findOne(id: string) {
