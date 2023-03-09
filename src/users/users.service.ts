@@ -68,6 +68,11 @@ export class UsersService {
 
   async remove(userId: string) {
     const path = `./src/assets/image${userId}.txt`;
+    if (!path) {
+      throw new BadRequestException(
+        `Image from user with Id:${userId} already deleted`,
+      );
+    }
     unlinkSync(path);
     return this.imageModel.deleteOne({ userId });
   }

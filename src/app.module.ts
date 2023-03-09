@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
-      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@users.nff7kzb.mongodb.net/?retryWrites=true&w=majority`,
+      `mongodb+srv://admin:admin@users.nff7kzb.mongodb.net/?retryWrites=true&w=majority`,
     ),
     ConfigModule.forRoot({
       envFilePath: ['.env'],
