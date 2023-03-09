@@ -1,14 +1,14 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { UsersService } from '../users.service';
 import { of } from 'rxjs';
 import { BadRequestException, HttpStatus } from '@nestjs/common';
 import * as sinon from 'sinon';
-import { axiosResponse } from '../test/axios-response.helper';
+import { axiosResponse } from './axios-response.helper';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from './interface/user.interface';
-import { Image } from './interface/image.interface';
+import { User } from '../interface/user.interface';
+import { Image } from '../interface/image.interface';
 import axios from 'axios';
 import * as fs from 'fs';
 
