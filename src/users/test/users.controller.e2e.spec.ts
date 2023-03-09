@@ -107,7 +107,6 @@ describe('UsersController (e2e)', () => {
   });
   it('/api/users/:id/avatar (DEL)', async () => {
     imageModel.deleteOne = jest.fn().mockResolvedValue({ n: 1 });
-
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     jest.spyOn(fs, 'unlinkSync').mockImplementation(() => {});
 
