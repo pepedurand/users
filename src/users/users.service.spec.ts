@@ -11,7 +11,6 @@ import { User } from './interface/user.interface';
 import { Image } from './interface/image.interface';
 import axios from 'axios';
 import * as fs from 'fs';
-// import { mocked } from 'ts-jest/utils'
 
 const userId = '1';
 const expectedUser = {
@@ -61,32 +60,59 @@ describe('Users Service', () => {
     jest.spyOn(axios, 'get').mockResolvedValue({
       data: Buffer.from(avatarBase64, 'base64'),
     });
-
     userModel.findOne = jest.fn().mockResolvedValue({
       avatar: avatarUrl,
     });
+  });
 
-    imageModel.findOne = jest.fn().mockResolvedValue({
-      userId: _id,
-      file: imagePath,
+  describe('findOne', () => {
+    it('should return a user with the given id', async () => {
+      const response = axiosResponse(
+        HttpStatus.OK,
+        { data: expectedUser },
+        'Ok',
+      );
+
+      httpService.get
+        .withArgs(`https://reqres.in/api/users/${userId}`)
+        .returns(of(response));
+
+      const user = await userService.findOne(userId);
+      expect(user).toEqual(expectedUser);
     });
   });
 
-  it('should return a user with the given id', async () => {
-    const response = axiosResponse(HttpStatus.OK, { data: expectedUser }, 'Ok');
+  describe('findUserAvatar', () => {
+    it('should return the saved image if it image exists', async () => {
+      imageModel.findOne = jest.fn().mockResolvedValue({
+        userId: _id,
+        file: imagePath,
+      });
+      const result = await userService.findUserAvatar(_id);
 
-    httpService.get
-      .withArgs(`https://reqres.in/api/users/${userId}`)
-      .returns(of(response));
+      expect(result.userId).toBe(_id);
+      expect(result.file).toBe(imagePath);
+      expect(userModel.findOne).toHaveBeenCalledWith({ _id });
+      expect(imageModel.findOne).toHaveBeenCalledWith({ userId: _id });
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+    it('should save the image if image not exists', async () => {
+      jest.mocked(fs.existsSync).mockReturnValueOnce(false);
+      imageModel.findOne = jest.fn().mockResolvedValue({ userId: _id });
+      imageModel.create = jest
+        .fn()
+        .mockResolvedValue({ userId: _id, file: imagePath });
 
-    const user = await userService.findOne(userId);
-    expect(user).toEqual(expectedUser);
-  });
-  it('deve retornar o avatar do usuário', async () => {
-    const result = await userService.findUserAvatar(_id);
-    expect(result.userId).toBe(_id);
-    expect(result.file).toBe(imagePath);
-    expect(userModel.findOne).toHaveBeenCalledWith({ _id });
-    expect(imageModel.findOne).toHaveBeenCalledWith({ userId: _id });
+      const result = await userService.findUserAvatar(_id);
+
+      expect(result.userId).toBe(_id);
+      expect(result.file).toBe(imagePath);
+      expect(userModel.findOne).toHaveBeenCalledWith({ _id });
+      expect(axios.get).toHaveBeenCalledWith(avatarUrl, {
+        responseType: 'arraybuffer',
+      });
+      expect(fs.existsSync).toHaveBeenCalledWith(imagePath);
+      expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
+    });
   });
 });

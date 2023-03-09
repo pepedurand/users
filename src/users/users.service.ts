@@ -58,8 +58,10 @@ export class UsersService {
 
     if (!existsSync(path)) {
       writeFileSync(path, response);
-      const avatarImage = new this.imageModel({ userId: _id, file: path });
-      return avatarImage.save();
+      return await this.imageModel.create({
+        userId: _id,
+        file: path,
+      });
     }
 
     return this.imageModel.findOne({ userId: _id });
